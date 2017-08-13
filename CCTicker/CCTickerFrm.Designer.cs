@@ -29,6 +29,7 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CCTickerFrm));
       this.lblDecredUSDValue = new System.Windows.Forms.Label();
       this.lblDecredUSDValueDisplay = new System.Windows.Forms.Label();
       this.tmrDecred = new System.Windows.Forms.Timer(this.components);
@@ -93,7 +94,8 @@
       this.Controls.Add(this.lblBitcoinUSDValue);
       this.Controls.Add(this.lblDecredUSDValueDisplay);
       this.Controls.Add(this.lblDecredUSDValue);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.Name = "CCTickerFrm";
       this.Load += new System.EventHandler(this.Form1_Load);
       this.ResumeLayout(false);
