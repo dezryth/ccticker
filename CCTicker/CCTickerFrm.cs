@@ -67,20 +67,28 @@ namespace CCTicker
 
     private void RequestCryptoInfo()
     {
-      using (WebClient wc = new WebClient())
+      try
       {
-        string decredjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/decred");
-        string bitcoinjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/bitcoin");
+        using (WebClient wc = new WebClient())
+        {
+          string decredjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/decred");
+          string bitcoinjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/bitcoin");
 
 
-        decredjson = StripArrayCharacters(decredjson);
-        bitcoinjson = StripArrayCharacters(bitcoinjson);
+          decredjson = StripArrayCharacters(decredjson);
+          bitcoinjson = StripArrayCharacters(bitcoinjson);
 
-        CryptoStats decred = JsonConvert.DeserializeObject<CryptoStats>(decredjson);
-        CryptoStats bitcoin = JsonConvert.DeserializeObject<CryptoStats>(bitcoinjson);
+          CryptoStats decred = JsonConvert.DeserializeObject<CryptoStats>(decredjson);
+          CryptoStats bitcoin = JsonConvert.DeserializeObject<CryptoStats>(bitcoinjson);
 
-        lblDecredUSDValueDisplay.Text = "$" + decred.price_usd.ToString();
-        lblBitcoinUSDValueDisplay.Text = "$" + bitcoin.price_usd.ToString();
+          lblDecredUSDValueDisplay.Text = "$" + decred.price_usd.ToString();
+          lblBitcoinUSDValueDisplay.Text = "$" + bitcoin.price_usd.ToString();
+        }
+      }
+      catch(Exception)
+      {
+        tmrDecred.Stop();
+        lblHTTPException.Visible = true;
       }
     }
 
@@ -89,6 +97,12 @@ namespace CCTicker
       json = json.Replace("[", "");
       json = json.Replace("]", "");
       return json;
+    }
+
+    private void lblHTTPException_Click(object sender, EventArgs e)
+    {
+      lblHTTPException.Visible = false;
+      tmrDecred.Start();
     }
   }
 }

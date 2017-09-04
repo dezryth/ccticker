@@ -35,6 +35,7 @@
       this.tmrDecred = new System.Windows.Forms.Timer(this.components);
       this.lblBitcoinUSDValue = new System.Windows.Forms.Label();
       this.lblBitcoinUSDValueDisplay = new System.Windows.Forms.Label();
+      this.lblHTTPException = new System.Windows.Forms.Label();
       this.SuspendLayout();
       // 
       // lblDecredUSDValue
@@ -86,10 +87,24 @@
       this.lblBitcoinUSDValueDisplay.TabIndex = 4;
       this.lblBitcoinUSDValueDisplay.Text = "$$$$$$$$";
       // 
+      // lblHTTPException
+      // 
+      this.lblHTTPException.AutoSize = true;
+      this.lblHTTPException.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblHTTPException.ForeColor = System.Drawing.Color.Yellow;
+      this.lblHTTPException.Location = new System.Drawing.Point(7, 186);
+      this.lblHTTPException.Name = "lblHTTPException";
+      this.lblHTTPException.Size = new System.Drawing.Size(216, 16);
+      this.lblHTTPException.TabIndex = 5;
+      this.lblHTTPException.Text = "! Error refreshing. Click here to retry!";
+      this.lblHTTPException.Visible = false;
+      this.lblHTTPException.Click += new System.EventHandler(this.lblHTTPException_Click);
+      // 
       // CCTickerFrm
       // 
       this.BackColor = System.Drawing.Color.Black;
       this.ClientSize = new System.Drawing.Size(223, 211);
+      this.Controls.Add(this.lblHTTPException);
       this.Controls.Add(this.lblBitcoinUSDValueDisplay);
       this.Controls.Add(this.lblBitcoinUSDValue);
       this.Controls.Add(this.lblDecredUSDValueDisplay);
@@ -110,6 +125,7 @@
     private System.Windows.Forms.Timer tmrDecred;
     private System.Windows.Forms.Label lblBitcoinUSDValue;
     private System.Windows.Forms.Label lblBitcoinUSDValueDisplay;
+    private System.Windows.Forms.Label lblHTTPException;
   }
 }
 
