@@ -8,101 +8,98 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CCTicker.CCTickerFrm;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CCTicker
 {
-  public partial class CCTickerFrm : Form
-  {
-    public CCTickerFrm()
+    public partial class CCTickerFrm : Form
     {
-      InitializeComponent();
-      tmrDecred.Start();
-      RequestCryptoInfo();
-    }
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HTCAPTION = 0x2;
 
-    [Serializable]
-    public class CryptoStats
-    {
-      [JsonProperty("id")]
-      public string id { get; set; }
-      [JsonProperty("name")]
-      public string name { get; set; }
-      [JsonProperty("symbol")]
-      public string symbol { get; set; }
-      [JsonProperty("rank")]
-      public int rank { get; set; }
-      [JsonProperty("price_usd")]
-      public float price_usd { get; set; }
-      [JsonProperty("price_btc")]
-      public float price_btc { get; set; }
-      [JsonProperty("24h_volume_usd")]
-      public float day_volume_usd { get; set; }
-      [JsonProperty("market_cap_usd")]
-      public float market_cap_usd { get; set; }
-      [JsonProperty("total_supply")]
-      public float total_supply { get; set; }
-      [JsonProperty("percent_change_1h")]
-      public float percent_change_1h { get; set; }
-      [JsonProperty("percent_change_24h")]
-      public float percent_change_24h { get; set; }
-      [JsonProperty("percent_change_7d")]
-      public float percent_change_7d { get; set; }
-      [JsonProperty("last_updated")]
-      public double last_updated { get; set; }
-    }
+        [DllImport("User32.dll")]
+        public static extern bool ReleaseCapture();
 
-    private void Form1_Load(object sender, EventArgs e)
-    {
+        [DllImport("User32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
-    }
-
-    private void tmrDecred_Tick(object sender, EventArgs e)
-    {
-      RequestCryptoInfo();
-    }
-
-    private void RequestCryptoInfo()
-    {
-      try
-      {
-        using (WebClient wc = new WebClient())
+        public CCTickerFrm()
         {
-          string decredjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/decred");
-          string bitcoinjson = wc.DownloadString("https://api.coinmarketcap.com/v1/ticker/bitcoin");
-
-
-          decredjson = StripArrayCharacters(decredjson);
-          bitcoinjson = StripArrayCharacters(bitcoinjson);
-
-          CryptoStats decred = JsonConvert.DeserializeObject<CryptoStats>(decredjson);
-          CryptoStats bitcoin = JsonConvert.DeserializeObject<CryptoStats>(bitcoinjson);
-
-          lblDecredUSDValueDisplay.Text = "$" + decred.price_usd.ToString();
-          lblBitcoinUSDValueDisplay.Text = "$" + bitcoin.price_usd.ToString();
+            InitializeComponent();
+            tmrDecred.Start();
+            RequestCryptoInfo();
+            this.MouseDown += new MouseEventHandler(Form1_MouseDown);
         }
-      }
-      catch(Exception)
-      {
-        tmrDecred.Stop();
-        lblHTTPException.Visible = true;
-      }
-    }
 
-    private string StripArrayCharacters(string json)
-    {
-      json = json.Replace("[", "");
-      json = json.Replace("]", "");
-      return json;
-    }
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            }
+        }
 
-    private void lblHTTPException_Click(object sender, EventArgs e)
-    {
-      lblHTTPException.Visible = false;
-      tmrDecred.Start();
+        public class CryptoPrice
+        {
+            [JsonProperty("usd")]
+            public decimal Usd { get; set; }
+        }
+
+        public class DecredResponse
+        {
+            [JsonProperty("decred")]
+            public CryptoPrice Decred { get; set; }
+        }
+
+        public class BitcoinResponse
+        {
+            [JsonProperty("bitcoin")]
+            public CryptoPrice Bitcoin { get; set; }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tmrDecred_Tick(object sender, EventArgs e)
+        {
+            RequestCryptoInfo();
+        }
+
+        private void RequestCryptoInfo()
+        {
+            try
+            {
+                using (WebClient wc = new WebClient())
+                {
+                    string decredjson = wc.DownloadString("https://api.coingecko.com/api/v3/simple/price?ids=decred&vs_currencies=usd");
+                    string bitcoinjson = wc.DownloadString("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+
+                    DecredResponse decred = JsonConvert.DeserializeObject<DecredResponse>(decredjson);
+                    BitcoinResponse bitcoin = JsonConvert.DeserializeObject<BitcoinResponse>(bitcoinjson);
+
+                    lblDecredUSDValueDisplay.Text = "$" + decred.Decred.Usd.ToString("N");
+                    lblBitcoinUSDValueDisplay.Text = "$" + bitcoin.Bitcoin.Usd.ToString("N");
+                }
+            }
+            catch (Exception)
+            {
+                tmrDecred.Stop();
+                lblHTTPException.Visible = true;
+            }
+        }
+
+        private void lblHTTPException_Click(object sender, EventArgs e)
+        {
+            lblHTTPException.Visible = false;
+            tmrDecred.Start();
+        }
     }
-  }
 }
