@@ -62,7 +62,7 @@
             // 
             // tmrDecred
             // 
-            this.tmrDecred.Interval = 120000;
+            this.tmrDecred.Interval = 600000;
             this.tmrDecred.Tick += new System.EventHandler(this.tmrDecred_Tick);
             // 
             // lblBitcoinUSDValue
