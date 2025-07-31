@@ -92,7 +92,7 @@
             this.lblHTTPException.AutoSize = true;
             this.lblHTTPException.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblHTTPException.ForeColor = System.Drawing.Color.Yellow;
-            this.lblHTTPException.Location = new System.Drawing.Point(7, 186);
+            this.lblHTTPException.Location = new System.Drawing.Point(36, 191);
             this.lblHTTPException.Name = "lblHTTPException";
             this.lblHTTPException.Size = new System.Drawing.Size(215, 16);
             this.lblHTTPException.TabIndex = 5;
@@ -104,7 +104,7 @@
             // 
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(227, 215);
+            this.ClientSize = new System.Drawing.Size(281, 216);
             this.ControlBox = false;
             this.Controls.Add(this.lblHTTPException);
             this.Controls.Add(this.lblBitcoinUSDValueDisplay);

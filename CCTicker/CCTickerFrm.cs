@@ -28,12 +28,65 @@ namespace CCTicker
         [DllImport("User32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
+        // Add exception counter
+        private int exceptionCount = 0;
+
+        // Add NotifyIcon and ContextMenuStrip
+        private NotifyIcon trayIcon;
+        private ContextMenuStrip trayMenu;
+
         public CCTickerFrm()
         {
             InitializeComponent();
+
+            // Always hide from taskbar
+            this.ShowInTaskbar = false;
+            this.WindowState = FormWindowState.Minimized;
+            this.Visible = false;
+
+            trayMenu = new ContextMenuStrip();
+            trayMenu.Items.Add("Show", null, TrayShow_Click);
+            trayMenu.Items.Add("Exit", null, TrayExit_Click);
+
+            trayIcon = new NotifyIcon();
+            trayIcon.Text = "CCTicker";
+            trayIcon.Icon = this.Icon;
+            trayIcon.ContextMenuStrip = trayMenu;
+            trayIcon.Visible = true;
+            trayIcon.DoubleClick += TrayIcon_DoubleClick;
+
             tmrDecred.Start();
             RequestCryptoInfo();
             this.MouseDown += new MouseEventHandler(Form1_MouseDown);
+        }
+
+        private void TrayIcon_DoubleClick(object sender, EventArgs e)
+        {
+            ShowForm();
+        }
+
+        private void TrayShow_Click(object sender, EventArgs e)
+        {
+            ShowForm();
+        }
+
+        private void TrayExit_Click(object sender, EventArgs e)
+        {
+            trayIcon.Visible = false;
+            Application.Exit();
+        }
+
+        private void ShowForm()
+        {
+            this.Visible = true;
+            this.WindowState = FormWindowState.Normal;            
+            this.Activate();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            trayIcon.Visible = false;
+            base.OnFormClosing(e);
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -87,12 +140,19 @@ namespace CCTicker
 
                     lblDecredUSDValueDisplay.Text = "$" + decred.Decred.Usd.ToString("N");
                     lblBitcoinUSDValueDisplay.Text = "$" + bitcoin.Bitcoin.Usd.ToString("N");
+
+                    // Reset exception counter on success
+                    exceptionCount = 0;
                 }
             }
             catch (Exception)
             {
-                tmrDecred.Stop();
-                lblHTTPException.Visible = true;
+                exceptionCount++;
+                if (exceptionCount >= 10)
+                {
+                    tmrDecred.Stop();
+                    lblHTTPException.Visible = true;
+                }                
             }
         }
 
